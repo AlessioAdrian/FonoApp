@@ -3,54 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FonoApp - Limpo e Rápido</title>
+    <title>FonoApp - Estável</title>
     <style>
         :root {
             --primary: #2c3e50; --secondary: #3498db; --success: #27ae60;
-            --accent: #e67e22; --bg: #f4f7f6; --white: #ffffff;
+            --accent: #e67e22; --bg: #f4f7f6;
         }
 
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding-bottom: 50px; }
         header { background: var(--primary); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
         
         .container { max-width: 550px; margin: auto; padding: 15px; }
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
-        /* Cartões de Exercícios */
-        .card { background: var(--white); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .cat-tag { font-size: 0.7em; font-weight: bold; color: var(--secondary); text-transform: uppercase; letter-spacing: 1px; }
-        
-        /* Área de Vídeo Oculta por padrão */
         .video-box { display: none; margin-top: 15px; border-radius: 10px; overflow: hidden; background: #000; position: relative; padding-bottom: 56.25%; height: 0; }
         .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
         .frase-box { background: #e8f4fd; border-left: 5px solid var(--secondary); padding: 20px; font-size: 1.2em; font-weight: bold; text-align: center; margin: 15px 0; border-radius: 8px; }
 
-        /* Botões */
-        button { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1em; transition: 0.2s; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1em; }
         .btn-done { background: var(--secondary); color: white; }
         .btn-done:disabled { background: var(--success); opacity: 0.8; }
         .btn-example { background: #ecf0f1; color: var(--primary); border: 1px solid #dcdde1; }
         .btn-voice { background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; gap: 8px; }
         
-        .progress-bar { height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; margin-top: 15px; overflow: hidden; }
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; margin-top: 10px; overflow: hidden; }
         #progress-fill { height: 100%; width: 0%; background: var(--success); transition: 0.5s; }
 
-        .setup-screen { text-align: center; padding: 80px 20px; }
-        input[type="text"] { width: 85%; padding: 15px; border-radius: 10px; border: 1px solid #ccc; font-size: 1.1em; margin-bottom: 10px; }
+        .external-link { display: block; text-align: center; margin-top: 10px; color: var(--secondary); font-size: 0.9em; text-decoration: none; }
     </style>
 </head>
 <body>
 
-<div id="setup-screen" class="setup-screen" style="display:none;">
+<div id="setup-screen" style="display:none; text-align:center; padding:80px 20px;">
     <h1>FonoApp</h1>
-    <p>Como podemos te chamar?</p>
-    <input type="text" id="user-name-input" placeholder="Seu nome">
+    <p>Olá! Qual seu nome?</p>
+    <input type="text" id="user-name-input" style="width:80%; padding:15px; border-radius:10px; border:1px solid #ccc; margin-bottom:10px;">
     <button class="btn-done" onclick="salvarNome()">Entrar</button>
 </div>
 
 <div id="main-app" style="display:none;">
     <header>
-        <div id="user-greeting">Olá!</div>
+        <div id="user-greeting" style="font-weight:bold; font-size:1.2em;">Olá!</div>
         <div class="progress-bar"><div id="progress-fill"></div></div>
     </header>
 
@@ -59,15 +53,15 @@
 
 <script>
     const exercicios = [
-        { t: "Bico e Sorriso", d: "Alterne entre bico e sorriso largo 10 vezes.", m: "z4T-oYm-SNA", c: "Lábios" },
-        { t: "Língua no Paladar", d: "Pressione a ponta da língua no céu da boca.", m: "4yA8t82pEuo", c: "Língua" },
-        { t: "Inflar Bochechas", d: "Encha as bochechas de ar por 5 segundos.", m: "6_9C-nL9O1M", c: "Bochechas" },
-        { t: "Língua Lateral", d: "Toque os cantos da boca com a língua.", m: "fAAsB9e5T68", c: "Língua" },
-        { t: "Sopro com Canudo", d: "Sopre ar através de um canudo na água.", m: "f7-nO7XU_vA", c: "Respiração" },
-        { t: "Vibração de Lábios", d: "Faça o som de motorzinho (Brrrrr).", m: "zV9Yh-hF7b0", c: "Voz" },
-        { t: "Limpeza dos Dentes", d: "Passe a língua em círculo nos dentes.", m: "8v_Ym06O7-w", c: "Língua" },
-        { t: "Som do K", d: "Repita 'KA-KA-KA' com força.", m: "HqD1-A_R5n0", c: "Fala" },
-        { t: "Bocejo e Estalo", d: "Simule um bocejo e estale a língua.", m: "U3B9_o3wLd0", c: "Deglutição" },
+        { t: "Bico e Sorriso", d: "Alterne entre bico e sorriso largo 10 vezes.", idV: "z4T-oYm-SNA", c: "Lábios" },
+        { t: "Língua no Paladar", d: "Pressione a ponta da língua no céu da boca.", idV: "4yA8t82pEuo", c: "Língua" },
+        { t: "Inflar Bochechas", d: "Encha as bochechas de ar por 5 segundos.", idV: "6_9C-nL9O1M", c: "Bochechas" },
+        { t: "Língua Lateral", d: "Toque os cantos da boca com a língua.", idV: "fAAsB9e5T68", c: "Língua" },
+        { t: "Sopro com Canudo", d: "Sopre ar através de um canudo na água.", idV: "f7-nO7XU_vA", c: "Respiração" },
+        { t: "Vibração de Lábios", d: "Faça o som de motorzinho (Brrrrr).", idV: "zV9Yh-hF7b0", c: "Voz" },
+        { t: "Limpeza dos Dentes", d: "Passe a língua em círculo nos dentes.", idV: "8v_Ym06O7-w", c: "Língua" },
+        { t: "Som do K", d: "Repita 'KA-KA-KA' com força.", idV: "HqD1-A_R5n0", c: "Fala" },
+        { t: "Bocejo e Estalo", d: "Simule um bocejo e estale a língua.", idV: "U3B9_o3wLd0", c: "Deglutição" },
         { t: "Frase de Treino", d: "Leia com clareza:", isFrase: true, c: "Articulação" }
     ];
 
@@ -83,15 +77,25 @@
     function toggleVideo(id) {
         const box = document.getElementById(`video-box-${id}`);
         const btn = document.getElementById(`btn-ex-${id}`);
+        const videoId = exercicios[id].idV;
+
         if (box.style.display === "block") {
             box.style.display = "none";
             btn.innerText = "📺 Ver Exemplo em Vídeo";
-            box.innerHTML = ""; // Para o vídeo ao fechar
+            box.innerHTML = ""; 
         } else {
             box.style.display = "block";
             btn.innerText = "❌ Fechar Vídeo";
-            const videoId = exercicios[id].m;
-            box.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            // Adicionado parâmetros de segurança e origem
+            box.innerHTML = `
+                <iframe 
+                    src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&showinfo=0" 
+                    allow="autoplay; encrypted-media" 
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+                </iframe>
+                <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" class="external-link">Abrir direto no YouTube (se houver erro)</a>
+            `;
         }
     }
 
@@ -113,7 +117,7 @@
         const list = document.getElementById('exercises-list');
         list.innerHTML = exercicios.map((ex, i) => `
             <div class="card">
-                <span class="cat-tag">${ex.c}</span>
+                <small style="color:var(--secondary)">${ex.c}</small>
                 <h3 style="margin:5px 0">${ex.t}</h3>
                 <p id="t-${i}">${ex.d}</p>
                 
@@ -126,7 +130,7 @@
                     <div class="video-box" id="video-box-${i}"></div>
                 `}
                 
-                <button class="btn-done" onclick="this.disabled=true; this.innerText='✓ Concluído'; atualizarProgresso();">Marcar como Feito</button>
+                <button class="btn-done" onclick="this.disabled=true; this.innerText='✓ Concluído'; atualizarProgresso();">Concluir</button>
             </div>
         `).join('');
     }
