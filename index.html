@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FonoApp - Imagens e Vídeos</title>
+    <title>FonoApp - Treino 10 Exercícios</title>
     <style>
         :root {
             --primary: #2c3e50; --secondary: #3498db; --success: #27ae60;
@@ -19,7 +19,6 @@
         .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .cat-tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; background: #ecf0f1; color: #7f8c8d; font-weight: bold; margin-bottom: 10px; }
         
-        /* Estilo para Imagens e Vídeos */
         .media-container { width: 100%; border-radius: 12px; overflow: hidden; margin: 15px 0; background: #eee; }
         .media-img { width: 100%; height: auto; display: block; object-fit: cover; }
         
@@ -66,38 +65,17 @@
 </div>
 
 <script>
-    /* COMO INSERIR MÍDIA:
-       tipo: "video" -> coloque o link de embed do youtube em 'midia'
-       tipo: "imagem" -> coloque o link da imagem (jpg, png) em 'midia'
-    */
     const exercicios = [
-        { 
-            t: "Bico e Sorriso", 
-            d: "Alterne entre bico e sorriso largo 10 vezes.", 
-            tipo: "video", 
-            midia: "https://github.com/AlessioAdrian/FonoApp/blob/main/img1.PNG", 
-            c: "Lábios" 
-        },
-        { 
-            t: "Língua no Paladar", 
-            d: "Pressione a ponta da língua no céu da boca com força.", 
-            tipo: "imagem", 
-            midia: "https://via.placeholder.com/500x300/3498db/ffffff?text=Imagem+Exemplo+Lingua", 
-            c: "Língua" 
-        },
-        { 
-            t: "Inflar Bochechas", 
-            d: "Encha as bochechas de ar e segure por 5 segundos.", 
-            tipo: "imagem", 
-            midia: "https://via.placeholder.com/500x300/e67e22/ffffff?text=Imagem+Bochechas", 
-            c: "Bochechas" 
-        },
-        { 
-            t: "Frase de Treino", 
-            d: "Leia esta frase em voz alta com clareza:", 
-            isFrase: true, 
-            c: "Articulação" 
-        }
+        { t: "Bico e Sorriso", d: "Alterne entre bico e sorriso largo 10 vezes.", tipo: "video", midia: "https://www.youtube.com/embed/z4T-oYm-SNA", c: "Lábios" },
+        { t: "Língua no Paladar", d: "Pressione a ponta da língua no céu da boca com força por 5 segundos.", tipo: "video", midia: "https://www.youtube.com/embed/4yA8t82pEuo", c: "Língua" },
+        { t: "Inflar Bochechas", d: "Encha as bochechas de ar e segure sem deixar escapar.", tipo: "video", midia: "https://www.youtube.com/embed/6_9C-nL9O1M", c: "Bochechas" },
+        { t: "Língua Lateral", d: "Toque os cantos da boca com a ponta da língua alternadamente.", tipo: "video", midia: "https://www.youtube.com/embed/fAAsB9e5T68", c: "Língua" },
+        { t: "Sopro com Canudo", d: "Sopre ar através de um canudo em um copo d'água.", tipo: "video", midia: "https://www.youtube.com/embed/f7-nO7XU_vA", c: "Respiração" },
+        { t: "Vibração de Lábios", d: "Faça o som de um motorzinho com os lábios (Brrrrr).", tipo: "video", midia: "https://www.youtube.com/embed/zV9Yh-hF7b0", c: "Voz" },
+        { t: "Limpeza dos Dentes", d: "Passe a língua em círculo entre os dentes e os lábios.", tipo: "video", midia: "https://www.youtube.com/embed/8v_Ym06O7-w", c: "Língua" },
+        { t: "Som do K", d: "Repita 'KA-KA-KA' com força para trabalhar a base da língua.", tipo: "video", midia: "https://www.youtube.com/embed/HqD1-A_R5n0", c: "Fala" },
+        { t: "Bocejo e Estalo", d: "Simule um bocejo e depois dê um estalo forte com a língua.", tipo: "video", midia: "https://www.youtube.com/embed/U3B9_o3wLd0", c: "Deglutição" },
+        { t: "Frase de Treino", d: "Leia esta frase em voz alta com clareza:", isFrase: true, c: "Articulação" }
     ];
 
     const frases = ["O sol sai cedo.", "Três tigres tristes.", "A pipoca pula.", "Vovô viu a vaca.", "Teco toca o tambor."];
@@ -130,11 +108,10 @@
         const list = document.getElementById('exercises-list');
         list.innerHTML = exercicios.map((ex, i) => {
             let mediaHTML = '';
-            
-            if (ex.tipo === "video") {
+            if (ex.tipo === "video" && ex.midia !== "") {
                 mediaHTML = `<div class="media-container"><div class="video-wrapper"><iframe src="${ex.midia}" allowfullscreen></iframe></div></div>`;
-            } else if (ex.tipo === "imagem") {
-                mediaHTML = `<div class="media-container"><img src="${ex.midia}" class="media-img" alt="Ilustração do exercício"></div>`;
+            } else if (ex.tipo === "imagem" && ex.midia !== "") {
+                mediaHTML = `<div class="media-container"><img src="${ex.midia}" class="media-img"></div>`;
             }
 
             return `
@@ -143,15 +120,13 @@
                 <h3 style="margin:5px 0">${ex.t}</h3>
                 <p id="t-${i}">${ex.d}</p>
                 <button class="btn-voice" onclick="lerTexto(document.getElementById('t-${i}').innerText)">🔊 Ouvir Instrução</button>
-                
                 ${ex.isFrase ? `
                     <div class="frase-box" id="f-box">"${frases[0]}"</div>
                     <button onclick="document.getElementById('f-box').innerText='\"'+frases[Math.floor(Math.random()*frases.length)]+'\"'" class="btn-done" style="background:#eee; color:#333">Trocar Frase</button>
                 ` : mediaHTML}
-                
                 <button class="btn-done" onclick="marcar(${i}, this)">Concluir Exercício</button>
-            </div>
-        `}).join('');
+            </div>`;
+        }).join('');
     }
 
     let concluidos = 0;
@@ -170,11 +145,7 @@
     }
 
     function resetar() { localStorage.clear(); location.reload(); }
-
     iniciar();
 </script>
 </body>
 </html>
-
-
-
