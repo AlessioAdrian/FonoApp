@@ -3,132 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FonoApp - Reabilitação</title>
+    <title>FonoApp - Imagens e Vídeos</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --success: #27ae60;
-            --accent: #e67e22;
-            --bg: #f4f7f6;
+            --primary: #2c3e50; --secondary: #3498db; --success: #27ae60;
+            --accent: #e67e22; --danger: #e74c3c; --bg: #f4f7f6;
         }
 
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding-bottom: 50px; }
         header { background: var(--primary); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
         
-        .container { max-width: 500px; margin: auto; padding: 15px; }
-        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .container { max-width: 550px; margin: auto; padding: 15px; }
+        .stats-bar { display: flex; justify-content: space-around; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 0.85em; }
+
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .cat-tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; background: #ecf0f1; color: #7f8c8d; font-weight: bold; margin-bottom: 10px; }
         
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 15px 0; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        /* Estilo para Imagens e Vídeos */
+        .media-container { width: 100%; border-radius: 12px; overflow: hidden; margin: 15px 0; background: #eee; }
+        .media-img { width: 100%; height: auto; display: block; object-fit: cover; }
+        
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        .frase-box { background: #e8f4fd; border-left: 5px solid var(--secondary); padding: 15px; font-size: 1.2em; font-weight: bold; text-align: center; margin: 10px 0; min-height: 50px; }
+        .frase-box { background: #e8f4fd; border-left: 5px solid var(--secondary); padding: 20px; font-size: 1.2em; font-weight: bold; text-align: center; margin: 15px 0; border-radius: 8px; }
 
-        button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; font-size: 1em; }
         .btn-done { background: var(--secondary); color: white; }
-        .btn-done:disabled { background: var(--success); }
-        .btn-voice { background: var(--accent); color: white; margin-bottom: 5px; }
-        .btn-next { background: #ecf0f1; color: var(--primary); border: 1px solid #bdc3c7; }
+        .btn-done:disabled { background: var(--success); opacity: 0.7; }
+        .btn-voice { background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        .progress-bar { height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; margin-top: 15px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: var(--success); transition: 0.8s; }
 
-        .progress-bar { height: 10px; background: #ddd; border-radius: 5px; margin-top: 10px; overflow: hidden; }
-        #progress-fill { height: 100%; width: 0%; background: var(--success); transition: 0.5s; }
+        .setup-screen { text-align: center; padding: 80px 20px; }
+        input[type="text"] { width: 80%; padding: 15px; border-radius: 10px; border: 1px solid #ccc; font-size: 1.1em; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
-<header>
-    <h2>FonoApp</h2>
-    <div class="progress-bar"><div id="progress-fill"></div></div>
-</header>
+<div id="setup-screen" class="setup-screen" style="display:none;">
+    <h1>FonoApp</h1>
+    <p>Olá! Como devemos te chamar?</p>
+    <input type="text" id="user-name-input" placeholder="Seu nome">
+    <button class="btn-done" onclick="salvarNome()">Entrar no App</button>
+</div>
 
-<div class="container" id="app"></div>
+<div id="main-app" style="display:none;">
+    <header>
+        <div id="user-greeting">Olá!</div>
+        <div class="stats-bar">
+            <div>🔥 Ofensiva: <span id="streak-val">0</span> dias</div>
+            <div>🏆 Concluídos: <span id="total-val">0</span></div>
+        </div>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+    </header>
+
+    <div class="container">
+        <div id="exercises-list"></div>
+        <button onclick="resetar()" style="background:none; color:#bbb; text-decoration:underline; font-size:0.7em; margin-top:30px">Reiniciar Aplicativo</button>
+    </div>
+</div>
 
 <script>
+    /* COMO INSERIR MÍDIA:
+       tipo: "video" -> coloque o link de embed do youtube em 'midia'
+       tipo: "imagem" -> coloque o link da imagem (jpg, png) em 'midia'
+    */
     const exercicios = [
         { 
             t: "Bico e Sorriso", 
-            d: "Alternar entre bico e sorriso para fortalecer os lábios.", 
-            v: "https://www.youtube.com/embed/z4T-oYm-SNA",
-            c: "Motricidade" 
+            d: "Alterne entre bico e sorriso largo 10 vezes.", 
+            tipo: "video", 
+            midia: "https://github.com/AlessioAdrian/FonoApp/blob/main/img1.PNG", 
+            c: "Lábios" 
         },
         { 
             t: "Língua no Paladar", 
             d: "Pressione a ponta da língua no céu da boca com força.", 
-            v: "https://www.youtube.com/embed/4yA8t82pEuo",
-            c: "Deglutição" 
+            tipo: "imagem", 
+            midia: "https://via.placeholder.com/500x300/3498db/ffffff?text=Imagem+Exemplo+Lingua", 
+            c: "Língua" 
+        },
+        { 
+            t: "Inflar Bochechas", 
+            d: "Encha as bochechas de ar e segure por 5 segundos.", 
+            tipo: "imagem", 
+            midia: "https://via.placeholder.com/500x300/e67e22/ffffff?text=Imagem+Bochechas", 
+            c: "Bochechas" 
         },
         { 
             t: "Frase de Treino", 
-            d: "Leia em voz alta, articulando bem cada sílaba:", 
+            d: "Leia esta frase em voz alta com clareza:", 
             isFrase: true, 
-            c: "Fala" 
+            c: "Articulação" 
         }
     ];
 
-    const frases = [
-        "O sol sai cedo.", "A pipoca pula na panela.", "Teco toca o tambor todo dia.",
-        "O gato gosta de comer guloseimas.", "Vovô viu a vaca no jardim.",
-        "A aranha arranha a jarra.", "Três pratos de trigo para três tigres."
-    ];
+    const frases = ["O sol sai cedo.", "Três tigres tristes.", "A pipoca pula.", "Vovô viu a vaca.", "Teco toca o tambor."];
 
-    // Função para ler o texto em voz alta
     function lerTexto(texto) {
-        const msg = new SpeechSynthesisUtterance();
-        msg.text = texto;
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(texto);
         msg.lang = 'pt-BR';
-        msg.rate = 0.9; // Um pouco mais lento para facilitar a compreensão
+        msg.rate = 0.85;
         window.speechSynthesis.speak(msg);
     }
 
-    function novaFrase() {
-        const frase = frases[Math.floor(Math.random() * frases.length)];
-        document.getElementById('txt-frase').innerText = `"${frase}"`;
+    function salvarNome() {
+        const n = document.getElementById('user-name-input').value;
+        if(n.trim()){ localStorage.setItem('fonoUser', n); iniciar(); }
     }
 
-    function carregarApp() {
-        const container = document.getElementById('app');
-        container.innerHTML = exercicios.map((ex, index) => `
+    function iniciar() {
+        const nome = localStorage.getItem('fonoUser');
+        if(!nome) { document.getElementById('setup-screen').style.display='block'; return; }
+        document.getElementById('setup-screen').style.display='none';
+        document.getElementById('main-app').style.display='block';
+        document.getElementById('user-greeting').innerText = `Olá, ${nome}!`;
+        const hist = JSON.parse(localStorage.getItem('fonoHist') || "[]");
+        document.getElementById('total-val').innerText = hist.length;
+        render();
+    }
+
+    function render() {
+        const list = document.getElementById('exercises-list');
+        list.innerHTML = exercicios.map((ex, i) => {
+            let mediaHTML = '';
+            
+            if (ex.tipo === "video") {
+                mediaHTML = `<div class="media-container"><div class="video-wrapper"><iframe src="${ex.midia}" allowfullscreen></iframe></div></div>`;
+            } else if (ex.tipo === "imagem") {
+                mediaHTML = `<div class="media-container"><img src="${ex.midia}" class="media-img" alt="Ilustração do exercício"></div>`;
+            }
+
+            return `
             <div class="card">
-                <small style="color:var(--secondary)">${ex.c}</small>
-                <h3>${ex.t}</h3>
-                <p id="desc-${index}">${ex.d}</p>
+                <span class="cat-tag">${ex.c}</span>
+                <h3 style="margin:5px 0">${ex.t}</h3>
+                <p id="t-${i}">${ex.d}</p>
+                <button class="btn-voice" onclick="lerTexto(document.getElementById('t-${i}').innerText)">🔊 Ouvir Instrução</button>
                 
-                <button class="btn-voice" onclick="lerConteudo(${index}, ${ex.isFrase || false})">🔊 Ouvir Exercício</button>
-
                 ${ex.isFrase ? `
-                    <div class="frase-box" id="txt-frase">"Clique em Nova Frase"</div>
-                    <button class="btn-next" onclick="novaFrase()">🔄 Outra Frase</button>
-                ` : `
-                    <div class="video-container">
-                        <iframe src="${ex.v}" frameborder="0" allowfullscreen></iframe>
-                    </div>
-                `}
+                    <div class="frase-box" id="f-box">"${frases[0]}"</div>
+                    <button onclick="document.getElementById('f-box').innerText='\"'+frases[Math.floor(Math.random()*frases.length)]+'\"'" class="btn-done" style="background:#eee; color:#333">Trocar Frase</button>
+                ` : mediaHTML}
                 
-                <button class="btn-done" onclick="concluir(this)">Marcar como Feito</button>
+                <button class="btn-done" onclick="marcar(${i}, this)">Concluir Exercício</button>
             </div>
-        `).join('');
-        novaFrase();
+        `}).join('');
     }
 
-    function lerConteudo(index, ehFrase) {
-        let texto = document.getElementById(`desc-${index}`).innerText;
-        if(ehFrase) {
-            texto += ". A frase é: " + document.getElementById('txt-frase').innerText;
+    let concluidos = 0;
+    function marcar(id, btn) {
+        if(!btn.disabled) {
+            btn.disabled = true; btn.innerText = "✓ Concluído";
+            concluidos++;
+            const p = (concluidos / exercicios.length) * 100;
+            document.getElementById('progress-fill').style.width = p + "%";
+            if(p === 100) {
+                let h = JSON.parse(localStorage.getItem('fonoHist') || "[]");
+                h.push(new Date().toLocaleDateString());
+                localStorage.setItem('fonoHist', JSON.stringify(h));
+            }
         }
-        lerTexto(texto);
     }
 
-    let feitos = 0;
-    function concluir(btn) {
-        btn.disabled = true;
-        btn.innerText = "✓ Concluído";
-        feitos++;
-        const porc = (feitos / exercicios.length) * 100;
-        document.getElementById('progress-fill').style.width = porc + "%";
-    }
+    function resetar() { localStorage.clear(); location.reload(); }
 
-    carregarApp();
+    iniciar();
 </script>
-
 </body>
 </html>
