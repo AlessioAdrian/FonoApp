@@ -6,129 +6,183 @@
     <title>FonoApp - Reabilitação</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --success: #27ae60;
-            --accent: #e67e22;
-            --bg: #f4f7f6;
+            --primary: #2c3e50; --secondary: #3498db; --success: #27ae60;
+            --accent: #e67e22; --danger: #e74c3c; --bg: #f4f7f6;
         }
 
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding-bottom: 50px; }
-        header { background: var(--primary); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
         
+        header { background: var(--primary); color: white; padding: 25px 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        #user-greeting { font-size: 1.4em; font-weight: bold; }
+        
+        .stats-bar { display: flex; justify-content: center; gap: 20px; margin-top: 10px; font-size: 0.9em; }
+        .stat-item { background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 15px; }
+
         .container { max-width: 500px; margin: auto; padding: 15px; }
-        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h2.section-title { color: var(--primary); border-bottom: 2px solid var(--secondary); padding-bottom: 5px; margin-top: 30px; font-size: 1.1em; text-transform: uppercase; }
         
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 15px 0; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .card-history { background: #fff; border: 1px dashed var(--secondary); text-align: center; }
 
-        .frase-box { background: #e8f4fd; border-left: 5px solid var(--secondary); padding: 15px; font-size: 1.2em; font-weight: bold; text-align: center; margin: 10px 0; min-height: 50px; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin: 15px 0; background: #000; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .frase-box { background: #e8f4fd; border-left: 5px solid var(--secondary); padding: 20px; font-size: 1.3em; font-weight: bold; text-align: center; margin: 15px 0; border-radius: 8px; }
+
+        button { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
         .btn-done { background: var(--secondary); color: white; }
         .btn-done:disabled { background: var(--success); }
-        .btn-voice { background: var(--accent); color: white; margin-bottom: 5px; }
-        .btn-next { background: #ecf0f1; color: var(--primary); border: 1px solid #bdc3c7; }
+        .btn-voice { background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; margin-top: 15px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: var(--success); transition: 0.8s; }
 
-        .progress-bar { height: 10px; background: #ddd; border-radius: 5px; margin-top: 10px; overflow: hidden; }
-        #progress-fill { height: 100%; width: 0%; background: var(--success); transition: 0.5s; }
+        .history-grid { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
+        .history-dot { width: 12px; height: 12px; border-radius: 50%; background: #ddd; }
+        .history-dot.active { background: var(--success); }
+
+        .name-input-area { text-align: center; padding: 60px 20px; }
+        input[type="text"] { width: 80%; padding: 15px; border-radius: 10px; border: 1px solid #ccc; font-size: 1.1em; text-align: center; }
     </style>
 </head>
 <body>
 
-<header>
-    <h2>FonoApp</h2>
-    <div class="progress-bar"><div id="progress-fill"></div></div>
-</header>
+<div id="setup-screen" style="display:none;" class="name-input-area">
+    <h2>Bem-vindo! Qual seu nome?</h2>
+    <input type="text" id="user-name-input" placeholder="Seu nome...">
+    <button class="btn-done" onclick="salvarNome()">Entrar no App</button>
+</div>
 
-<div class="container" id="app"></div>
+<div id="main-app" style="display:none;">
+    <header>
+        <div id="user-greeting">Olá!</div>
+        <div class="stats-bar">
+            <div class="stat-item">🔥 <span id="streak-count">0</span> dias seguidos</div>
+            <div class="stat-item">🏆 <span id="total-done">0</span> total</div>
+        </div>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+    </header>
+
+    <div class="container">
+        <div class="card card-history">
+            <h3 style="margin:0">Meu Histórico</h3>
+            <div class="history-grid" id="history-dots"></div>
+            <small id="status-hoje" style="display:block; margin-top:10px; color:#7f8c8d"></small>
+        </div>
+
+        <h2 class="section-title">🚨 Segurança</h2>
+        <div id="safety-section"></div>
+
+        <h2 class="section-title">💪 Exercícios</h2>
+        <div id="exercises-section"></div>
+        
+        <button onclick="resetarNome()" style="background:none; color:#999; text-decoration:underline; font-size:0.8em">Trocar Nome</button>
+    </div>
+</div>
 
 <script>
     const exercicios = [
-        { 
-            t: "Bico e Sorriso", 
-            d: "Alternar entre bico e sorriso para fortalecer os lábios.", 
-            v: "https://www.youtube.com/embed/z4T-oYm-SNA",
-            c: "Motricidade" 
-        },
-        { 
-            t: "Língua no Paladar", 
-            d: "Pressione a ponta da língua no céu da boca com força.", 
-            v: "https://www.youtube.com/embed/4yA8t82pEuo",
-            c: "Deglutição" 
-        },
-        { 
-            t: "Frase de Treino", 
-            d: "Leia em voz alta, articulando bem cada sílaba:", 
-            isFrase: true, 
-            c: "Fala" 
-        }
+        { t: "Bico e Sorriso", d: "Alterne entre bico e sorriso largo 10 vezes.", v: "https://www.youtube.com/embed/z4T-oYm-SNA", c: "Lábios" },
+        { t: "Língua no Paladar", d: "Pressione a língua no céu da boca com força.", v: "https://www.youtube.com/embed/4yA8t82pEuo", c: "Língua" },
+        { t: "Treino de Fala", d: "Leia pausadamente:", isFrase: true, c: "Voz" }
     ];
 
-    const frases = [
-        "O sol sai cedo.", "A pipoca pula na panela.", "Teco toca o tambor todo dia.",
-        "O gato gosta de comer guloseimas.", "Vovô viu a vaca no jardim.",
-        "A aranha arranha a jarra.", "Três pratos de trigo para três tigres."
-    ];
+    const frases = ["O sol sai cedo.", "A pipoca pula na panela.", "Vovô viu a vaca.", "Teco toca o tambor."];
 
-    // Função para ler o texto em voz alta
     function lerTexto(texto) {
-        const msg = new SpeechSynthesisUtterance();
-        msg.text = texto;
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(texto);
         msg.lang = 'pt-BR';
-        msg.rate = 0.9; // Um pouco mais lento para facilitar a compreensão
+        msg.rate = 0.85;
         window.speechSynthesis.speak(msg);
     }
 
-    function novaFrase() {
-        const frase = frases[Math.floor(Math.random() * frases.length)];
-        document.getElementById('txt-frase').innerText = `"${frase}"`;
+    // Lógica de Histórico e Nome
+    function iniciarApp() {
+        const nome = localStorage.getItem('fonoNome');
+        if (!nome) {
+            document.getElementById('setup-screen').style.display = 'block';
+            return;
+        }
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        document.getElementById('user-greeting').innerText = `Olá, ${nome}!`;
+        
+        atualizarStats();
+        renderizar();
     }
 
-    function carregarApp() {
-        const container = document.getElementById('app');
-        container.innerHTML = exercicios.map((ex, index) => `
-            <div class="card">
-                <small style="color:var(--secondary)">${ex.c}</small>
-                <h3>${ex.t}</h3>
-                <p id="desc-${index}">${ex.d}</p>
-                
-                <button class="btn-voice" onclick="lerConteudo(${index}, ${ex.isFrase || false})">🔊 Ouvir Exercício</button>
+    function salvarNome() {
+        const n = document.getElementById('user-name-input').value;
+        if(n.trim()) { localStorage.setItem('fonoNome', n); iniciarApp(); }
+    }
 
-                ${ex.isFrase ? `
-                    <div class="frase-box" id="txt-frase">"Clique em Nova Frase"</div>
-                    <button class="btn-next" onclick="novaFrase()">🔄 Outra Frase</button>
-                ` : `
-                    <div class="video-container">
-                        <iframe src="${ex.v}" frameborder="0" allowfullscreen></iframe>
-                    </div>
-                `}
-                
-                <button class="btn-done" onclick="concluir(this)">Marcar como Feito</button>
+    function atualizarStats() {
+        const historico = JSON.parse(localStorage.getItem('fonoHistorial') || "[]");
+        const hoje = new Date().toLocaleDateString();
+        
+        document.getElementById('total-done').innerText = historico.length;
+        
+        // Renderizar pontinhos de histórico (últimos 14 dias)
+        const grid = document.getElementById('history-dots');
+        grid.innerHTML = "";
+        for(let i=0; i<14; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'history-dot' + (i < historico.length ? ' active' : '');
+            grid.appendChild(dot);
+        }
+
+        const treinouHoje = historico.includes(hoje);
+        document.getElementById('status-hoje').innerText = treinouHoje ? "Você já treinou hoje! Parabéns!" : "Ainda não treinou hoje.";
+        
+        // Cálculo de Streak (Ofensiva) simplificado
+        document.getElementById('streak-count').innerText = historico.length > 0 ? "1+" : "0";
+    }
+
+    function renderizar() {
+        // Dicas de Segurança rápidas
+        document.getElementById('safety-section').innerHTML = `
+            <div class="card" style="border-left:5px solid var(--danger)">
+                <p style="margin:0"><strong>Postura:</strong> Sente-se reto. Ouvir instrução?</p>
+                <button class="btn-voice" onclick="lerTexto('Sente-se sempre bem reto para evitar engasgos.')">🔊 Ouvir</button>
+            </div>
+        `;
+
+        // Exercícios
+        document.getElementById('exercises-section').innerHTML = exercicios.map((ex, i) => `
+            <div class="card">
+                <small>${ex.c}</small>
+                <h3>${ex.t}</h3>
+                <p id="txt-${i}">${ex.d}</p>
+                <button class="btn-voice" onclick="lerTexto(document.getElementById('txt-${i}').innerText)">🔊 Ouvir</button>
+                ${ex.isFrase ? `<div class="frase-box">"${frases[Math.floor(Math.random()*frases.length)]}"</div>` : `<div class="video-wrapper"><iframe src="${ex.v}"></iframe></div>`}
+                <button class="btn-done" onclick="concluir(this)">Concluir</button>
             </div>
         `).join('');
-        novaFrase();
-    }
-
-    function lerConteudo(index, ehFrase) {
-        let texto = document.getElementById(`desc-${index}`).innerText;
-        if(ehFrase) {
-            texto += ". A frase é: " + document.getElementById('txt-frase').innerText;
-        }
-        lerTexto(texto);
     }
 
     let feitos = 0;
     function concluir(btn) {
-        btn.disabled = true;
-        btn.innerText = "✓ Concluído";
+        btn.disabled = true; btn.innerText = "✓";
         feitos++;
         const porc = (feitos / exercicios.length) * 100;
         document.getElementById('progress-fill').style.width = porc + "%";
+        
+        if(porc === 100) {
+            const historico = JSON.parse(localStorage.getItem('fonoHistorial') || "[]");
+            const hoje = new Date().toLocaleDateString();
+            if(!historico.includes(hoje)) {
+                historico.push(hoje);
+                localStorage.setItem('fonoHistorial', JSON.stringify(historico));
+            }
+            lerTexto("Parabéns! Treino do dia concluído!");
+            atualizarStats();
+        }
     }
 
-    carregarApp();
-</script>
+    function resetarNome() { localStorage.clear(); location.reload(); }
 
+    iniciarApp();
+</script>
 </body>
 </html>
