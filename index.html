@@ -4,144 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FonoApp - Reabilitação</title>
-    
     <style>
         :root {
             --primary: #2c3e50;
             --secondary: #3498db;
             --success: #27ae60;
+            --accent: #e67e22;
             --bg: #f4f7f6;
         }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding-bottom: 50px;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding-bottom: 50px; }
+        header { background: var(--primary); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
+        
+        .container { max-width: 500px; margin: auto; padding: 15px; }
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; margin: 15px 0; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        header {
-            background: var(--primary);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
+        .frase-box { background: #e8f4fd; border-left: 5px solid var(--secondary); padding: 15px; font-size: 1.2em; font-weight: bold; text-align: center; margin: 10px 0; min-height: 50px; }
 
-        .container {
-            max-width: 500px;
-            margin: auto;
-            padding: 15px;
-        }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-done { background: var(--secondary); color: white; }
+        .btn-done:disabled { background: var(--success); }
+        .btn-voice { background: var(--accent); color: white; margin-bottom: 5px; }
+        .btn-next { background: #ecf0f1; color: var(--primary); border: 1px solid #bdc3c7; }
 
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .video-placeholder {
-            background: #dfe6e9;
-            height: 180px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 15px 0;
-            color: #636e72;
-            text-align: center;
-            font-size: 0.9em;
-        }
-
-        .frase-box {
-            background: #e8f4fd;
-            border-left: 5px solid var(--secondary);
-            padding: 15px;
-            font-size: 1.2em;
-            font-weight: bold;
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background: var(--secondary);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button:disabled {
-            background: var(--success);
-        }
-
-        .progress-bar {
-            height: 10px;
-            background: #ddd;
-            border-radius: 5px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-
-        #progress-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--success);
-            transition: 0.5s;
-        }
+        .progress-bar { height: 10px; background: #ddd; border-radius: 5px; margin-top: 10px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: var(--success); transition: 0.5s; }
     </style>
 </head>
 <body>
 
 <header>
     <h2>FonoApp</h2>
-    <p>Treino Diário Pós-AVC</p>
     <div class="progress-bar"><div id="progress-fill"></div></div>
 </header>
 
-<div class="container" id="app">
-    </div>
+<div class="container" id="app"></div>
 
 <script>
     const exercicios = [
-        { t: "Bico e Sorriso", d: "Faça um bico forte e depois um sorriso largo.", c: "Motricidade" },
-        { t: "Língua no Paladar", d: "Pressione a língua no céu da boca por 5s.", c: "Deglutição" },
-        { t: "Frase do Dia", d: "Leia em voz alta pausadamente:", isFrase: true, c: "Fala" }
+        { 
+            t: "Bico e Sorriso", 
+            d: "Alternar entre bico e sorriso para fortalecer os lábios.", 
+            v: "https://www.youtube.com/embed/z4T-oYm-SNA",
+            c: "Motricidade" 
+        },
+        { 
+            t: "Língua no Paladar", 
+            d: "Pressione a ponta da língua no céu da boca com força.", 
+            v: "https://www.youtube.com/embed/4yA8t82pEuo",
+            c: "Deglutição" 
+        },
+        { 
+            t: "Frase de Treino", 
+            d: "Leia em voz alta, articulando bem cada sílaba:", 
+            isFrase: true, 
+            c: "Fala" 
+        }
     ];
 
     const frases = [
-        "O sol sai cedo.",
-        "A pipoca pula na panela.",
-        "Teco toca o tambor todo dia.",
-        "O gato gosta de comer guloseimas.",
-        "Vovô viu a vaca no jardim.",
-        "A aranha arranha a jarra.",
-        "Três pratos de trigo para três tigres."
+        "O sol sai cedo.", "A pipoca pula na panela.", "Teco toca o tambor todo dia.",
+        "O gato gosta de comer guloseimas.", "Vovô viu a vaca no jardim.",
+        "A aranha arranha a jarra.", "Três pratos de trigo para três tigres."
     ];
+
+    // Função para ler o texto em voz alta
+    function lerTexto(texto) {
+        const msg = new SpeechSynthesisUtterance();
+        msg.text = texto;
+        msg.lang = 'pt-BR';
+        msg.rate = 0.9; // Um pouco mais lento para facilitar a compreensão
+        window.speechSynthesis.speak(msg);
+    }
+
+    function novaFrase() {
+        const frase = frases[Math.floor(Math.random() * frases.length)];
+        document.getElementById('txt-frase').innerText = `"${frase}"`;
+    }
 
     function carregarApp() {
         const container = document.getElementById('app');
-        const fraseAleatoria = frases[Math.floor(Math.random() * frases.length)];
-
         container.innerHTML = exercicios.map((ex, index) => `
             <div class="card">
                 <small style="color:var(--secondary)">${ex.c}</small>
                 <h3>${ex.t}</h3>
-                <p>${ex.d}</p>
-                ${ex.isFrase ? `<div class="frase-box">"${fraseAleatoria}"</div>` : `<div class="video-placeholder">Espaço para Vídeo explicativo</div>`}
-                <button onclick="concluir(this, ${index})">Marcar como Feito</button>
+                <p id="desc-${index}">${ex.d}</p>
+                
+                <button class="btn-voice" onclick="lerConteudo(${index}, ${ex.isFrase || false})">🔊 Ouvir Exercício</button>
+
+                ${ex.isFrase ? `
+                    <div class="frase-box" id="txt-frase">"Clique em Nova Frase"</div>
+                    <button class="btn-next" onclick="novaFrase()">🔄 Outra Frase</button>
+                ` : `
+                    <div class="video-container">
+                        <iframe src="${ex.v}" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                `}
+                
+                <button class="btn-done" onclick="concluir(this)">Marcar como Feito</button>
             </div>
         `).join('');
+        novaFrase();
+    }
+
+    function lerConteudo(index, ehFrase) {
+        let texto = document.getElementById(`desc-${index}`).innerText;
+        if(ehFrase) {
+            texto += ". A frase é: " + document.getElementById('txt-frase').innerText;
+        }
+        lerTexto(texto);
     }
 
     let feitos = 0;
-    function concluir(btn, id) {
+    function concluir(btn) {
         btn.disabled = true;
         btn.innerText = "✓ Concluído";
         feitos++;
