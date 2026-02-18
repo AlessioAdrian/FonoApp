@@ -3,44 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FonoApp - Versão Estável</title>
+    <title>FonoApp - Limpo e Rápido</title>
     <style>
         :root {
             --primary: #2c3e50; --secondary: #3498db; --success: #27ae60;
-            --accent: #e67e22; --bg: #f4f7f6;
+            --accent: #e67e22; --bg: #f4f7f6; --white: #ffffff;
         }
 
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding-bottom: 50px; }
         header { background: var(--primary); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
         
         .container { max-width: 550px; margin: auto; padding: 15px; }
-        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        .media-container { width: 100%; border-radius: 12px; overflow: hidden; margin: 15px 0; background: #eee; min-height: 50px; }
-        .media-img { width: 100%; height: auto; display: block; border-radius: 12px; }
+        /* Cartões de Exercícios */
+        .card { background: var(--white); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .cat-tag { font-size: 0.7em; font-weight: bold; color: var(--secondary); text-transform: uppercase; letter-spacing: 1px; }
         
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        /* Área de Vídeo Oculta por padrão */
+        .video-box { display: none; margin-top: 15px; border-radius: 10px; overflow: hidden; background: #000; position: relative; padding-bottom: 56.25%; height: 0; }
+        .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
         .frase-box { background: #e8f4fd; border-left: 5px solid var(--secondary); padding: 20px; font-size: 1.2em; font-weight: bold; text-align: center; margin: 15px 0; border-radius: 8px; }
 
-        button { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1em; }
+        /* Botões */
+        button { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1em; transition: 0.2s; }
         .btn-done { background: var(--secondary); color: white; }
-        .btn-done:disabled { background: var(--success); opacity: 0.7; }
+        .btn-done:disabled { background: var(--success); opacity: 0.8; }
+        .btn-example { background: #ecf0f1; color: var(--primary); border: 1px solid #dcdde1; }
         .btn-voice { background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; gap: 8px; }
         
-        .progress-bar { height: 10px; background: rgba(255,255,255,0.2); border-radius: 5px; margin-top: 15px; overflow: hidden; }
-        #progress-fill { height: 100%; width: 0%; background: var(--success); transition: 0.8s; }
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; margin-top: 15px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: var(--success); transition: 0.5s; }
 
         .setup-screen { text-align: center; padding: 80px 20px; }
-        input[type="text"] { width: 80%; padding: 15px; border-radius: 10px; border: 1px solid #ccc; font-size: 1.1em; }
+        input[type="text"] { width: 85%; padding: 15px; border-radius: 10px; border: 1px solid #ccc; font-size: 1.1em; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div id="setup-screen" class="setup-screen" style="display:none;">
     <h1>FonoApp</h1>
-    <p>Como devemos te chamar?</p>
+    <p>Como podemos te chamar?</p>
     <input type="text" id="user-name-input" placeholder="Seu nome">
     <button class="btn-done" onclick="salvarNome()">Entrar</button>
 </div>
@@ -56,15 +59,15 @@
 
 <script>
     const exercicios = [
-        { t: "Bico e Sorriso", d: "Alterne entre bico e sorriso largo 10 vezes.", m: "https://github.com/AlessioAdrian/FonoApp/blob/main/img1.PNG", c: "Lábios" },
-        { t: "Língua no Paladar", d: "Pressione a ponta da língua no céu da boca.", m: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=500", c: "Língua" },
-        { t: "Inflar Bochechas", d: "Encha as bochechas de ar.", m: "https://www.youtube.com/embed/6_9C-nL9O1M", c: "Bochechas" },
-        { t: "Língua Lateral", d: "Toque os cantos da boca com a língua.", m: "https://www.youtube.com/embed/fAAsB9e5T68", c: "Língua" },
-        { t: "Sopro com Canudo", d: "Sopre ar através de um canudo.", m: "https://www.youtube.com/embed/f7-nO7XU_vA", c: "Respiração" },
-        { t: "Vibração de Lábios", d: "Faça o som de motorzinho (Brrrrr).", m: "https://www.youtube.com/embed/zV9Yh-hF7b0", c: "Voz" },
-        { t: "Limpeza dos Dentes", d: "Passe a língua em círculo nos dentes.", m: "https://www.youtube.com/embed/8v_Ym06O7-w", c: "Língua" },
-        { t: "Som do K", d: "Repita 'KA-KA-KA' com força.", m: "https://www.youtube.com/embed/HqD1-A_R5n0", c: "Fala" },
-        { t: "Bocejo e Estalo", d: "Simule um bocejo e estale a língua.", m: "https://www.youtube.com/embed/U3B9_o3wLd0", c: "Deglutição" },
+        { t: "Bico e Sorriso", d: "Alterne entre bico e sorriso largo 10 vezes.", m: "z4T-oYm-SNA", c: "Lábios" },
+        { t: "Língua no Paladar", d: "Pressione a ponta da língua no céu da boca.", m: "4yA8t82pEuo", c: "Língua" },
+        { t: "Inflar Bochechas", d: "Encha as bochechas de ar por 5 segundos.", m: "6_9C-nL9O1M", c: "Bochechas" },
+        { t: "Língua Lateral", d: "Toque os cantos da boca com a língua.", m: "fAAsB9e5T68", c: "Língua" },
+        { t: "Sopro com Canudo", d: "Sopre ar através de um canudo na água.", m: "f7-nO7XU_vA", c: "Respiração" },
+        { t: "Vibração de Lábios", d: "Faça o som de motorzinho (Brrrrr).", m: "zV9Yh-hF7b0", c: "Voz" },
+        { t: "Limpeza dos Dentes", d: "Passe a língua em círculo nos dentes.", m: "8v_Ym06O7-w", c: "Língua" },
+        { t: "Som do K", d: "Repita 'KA-KA-KA' com força.", m: "HqD1-A_R5n0", c: "Fala" },
+        { t: "Bocejo e Estalo", d: "Simule um bocejo e estale a língua.", m: "U3B9_o3wLd0", c: "Deglutição" },
         { t: "Frase de Treino", d: "Leia com clareza:", isFrase: true, c: "Articulação" }
     ];
 
@@ -75,6 +78,21 @@
         const msg = new SpeechSynthesisUtterance(texto);
         msg.lang = 'pt-BR';
         window.speechSynthesis.speak(msg);
+    }
+
+    function toggleVideo(id) {
+        const box = document.getElementById(`video-box-${id}`);
+        const btn = document.getElementById(`btn-ex-${id}`);
+        if (box.style.display === "block") {
+            box.style.display = "none";
+            btn.innerText = "📺 Ver Exemplo em Vídeo";
+            box.innerHTML = ""; // Para o vídeo ao fechar
+        } else {
+            box.style.display = "block";
+            btn.innerText = "❌ Fechar Vídeo";
+            const videoId = exercicios[id].m;
+            box.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        }
     }
 
     function iniciar() {
@@ -93,26 +111,24 @@
 
     function render() {
         const list = document.getElementById('exercises-list');
-        list.innerHTML = exercicios.map((ex, i) => {
-            let midiaHTML = '';
-            
-            if (!ex.isFrase && ex.m) {
-                if (ex.m.includes("youtube.com")) {
-                    midiaHTML = `<div class="media-container"><div class="video-wrapper"><iframe src="${ex.m}"></iframe></div></div>`;
-                } else {
-                    midiaHTML = `<div class="media-container"><img src="${ex.m}" class="media-img" onerror="this.src='https://placehold.co/500x300?text=Erro+ao+carregar+imagem'"></div>`;
-                }
-            }
-
-            return `
+        list.innerHTML = exercicios.map((ex, i) => `
             <div class="card">
-                <h3 style="margin:0">${ex.t}</h3>
+                <span class="cat-tag">${ex.c}</span>
+                <h3 style="margin:5px 0">${ex.t}</h3>
                 <p id="t-${i}">${ex.d}</p>
-                <button class="btn-voice" onclick="lerTexto(document.getElementById('t-${i}').innerText)">🔊 Ouvir</button>
-                ${ex.isFrase ? `<div class="frase-box">"${frases[0]}"</div>` : midiaHTML}
-                <button class="btn-done" onclick="this.disabled=true; this.innerText='✓ Feito'; atualizarProgresso();">Concluir</button>
-            </div>`;
-        }).join('');
+                
+                <button class="btn-voice" onclick="lerTexto(document.getElementById('t-${i}').innerText)">🔊 Ouvir Instrução</button>
+                
+                ${ex.isFrase ? `
+                    <div class="frase-box">"${frases[Math.floor(Math.random()*frases.length)]}"</div>
+                ` : `
+                    <button class="btn-example" id="btn-ex-${i}" onclick="toggleVideo(${i})">📺 Ver Exemplo em Vídeo</button>
+                    <div class="video-box" id="video-box-${i}"></div>
+                `}
+                
+                <button class="btn-done" onclick="this.disabled=true; this.innerText='✓ Concluído'; atualizarProgresso();">Marcar como Feito</button>
+            </div>
+        `).join('');
     }
 
     let feitos = 0;
@@ -125,4 +141,3 @@
 </script>
 </body>
 </html>
-
